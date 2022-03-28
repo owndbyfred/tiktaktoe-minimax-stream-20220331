@@ -1,3 +1,20 @@
-body {
-  background-color: blue;
+.Board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 300px;
+  margin: 200px auto;
+
+  &__Cell {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    font-size: 70px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }
