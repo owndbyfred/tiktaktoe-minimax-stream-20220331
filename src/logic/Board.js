@@ -1,9 +1,12 @@
+import { MiniMax } from "./MiniMax";
 import {
   PLAYER_1,
   PLAYER_2,
   SYMBOL_PLAYER_1,
   SYMBOL_PLAYER_2,
   TILE_EMPTY,
+  TILE_PLAYER_1,
+  TILE_PLAYER_2,
 } from "./Types";
 
 export default class Board {
@@ -14,7 +17,7 @@ export default class Board {
       [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
       [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
     ];
-    this.playerTurn = PLAYER_1;
+    this.isRunning = true;
 
     if (this.tileEles) this.init();
   }
@@ -24,34 +27,45 @@ export default class Board {
       tileEle.addEventListener("click", ({ target }) => {
         const coordinates = target.getAttribute("data-index").split("-");
 
-        if (!this.makeTurn(coordinates[0], coordinates[1])) {
+        if (!this.makeTurn(coordinates[0], coordinates[1], PLAYER_1)) {
           alert("Bitte wähle ein anderes Feld!");
+        } else {
+          if (this.isRunning) {
+            const miniMax = new MiniMax(this, PLAYER_2);
+
+            const { x, y } = miniMax.getBestTurn();
+
+            this.makeTurn(x, y, TILE_PLAYER_2);
+          }
         }
       });
     });
   }
 
-  makeTurn(x, y) {
+  makeTurn(x, y, player, isHumanTurn = true) {
     if (!this.isTileEmpty(x, y)) return false;
 
     // Update state
-    this.state[y][x] = this.playerTurn;
+    this.state[y][x] = player;
+    // console.log(this.state);
 
     // Update UI
-    const tileEle = this.getTileEle(x, y);
+    if (isHumanTurn) {
+      const tileEle = this.getTileEle(x, y);
 
-    const playerSymbol =
-      this.playerTurn === PLAYER_1 ? SYMBOL_PLAYER_1 : SYMBOL_PLAYER_2;
+      const playerSymbol =
+        player === PLAYER_1 ? SYMBOL_PLAYER_1 : SYMBOL_PLAYER_2;
 
-    tileEle.innerHTML = playerSymbol;
-    // Next player's turn
-    this.playerTurn = this.playerTurn === PLAYER_1 ? PLAYER_2 : PLAYER_1;
+      tileEle.innerHTML = playerSymbol;
+    }
 
     // Check if winner:
     const winner = this.checkWinner();
-    if (winner) {
+    if (winner && isHumanTurn) {
       alert(`Spieler ${winner} hat gewonnen!`);
     }
+
+    if (winner) this.isRunning = false;
 
     return true;
   }
@@ -64,6 +78,10 @@ export default class Board {
     return Array.from(this.tileEles).find(
       (tileEle) => tileEle.getAttribute("data-index") === `${x}-${y}`
     );
+  }
+
+  setTileEmpty(x, y) {
+    this.state[y][x] = TILE_EMPTY;
   }
 
   checkWinner() {
@@ -121,6 +139,8 @@ export default class Board {
       ) {
         success = false;
       }
+    } else {
+      success = false;
     }
 
     if (success) {
@@ -144,6 +164,8 @@ export default class Board {
       ) {
         success = false;
       }
+    } else {
+      success = false;
     }
 
     if (success) {
