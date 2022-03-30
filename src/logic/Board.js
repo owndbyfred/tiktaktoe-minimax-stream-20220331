@@ -10,19 +10,21 @@ import {
 } from "./Types";
 
 export default class Board {
-  constructor() {
+  constructor(state = null) {
     this.tileEles = document.querySelectorAll(".Board__Cell");
+    this.state = state;
+    this.isRunning = true;
+
+    if (this.tileEles && !state) this.init();
+  }
+
+  init() {
     this.state = [
       [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
       [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
       [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
     ];
-    this.isRunning = true;
 
-    if (this.tileEles) this.init();
-  }
-
-  init() {
     this.tileEles.forEach((tileEle) => {
       tileEle.addEventListener("click", ({ target }) => {
         const coordinates = target.getAttribute("data-index").split("-");
@@ -42,12 +44,16 @@ export default class Board {
     });
   }
 
+  getState() {
+    return this.state;
+  }
+
   makeTurn(x, y, player, isHumanTurn = true) {
     if (!this.isTileEmpty(x, y)) return false;
 
+    if (isHumanTurn) console.log(x, y);
     // Update state
     this.state[y][x] = player;
-    // console.log(this.state);
 
     // Update UI
     if (isHumanTurn) {
@@ -65,7 +71,7 @@ export default class Board {
       alert(`Spieler ${winner} hat gewonnen!`);
     }
 
-    if (winner) this.isRunning = false;
+    if (winner && isHumanTurn) this.isRunning = false;
 
     return true;
   }
@@ -85,42 +91,6 @@ export default class Board {
   }
 
   checkWinner() {
-    for (let i = 0; i < this.state.length; i++) {
-      for (let j = 0; j < this.state[i].length; j++) {
-        const playerOnTile = this.state[i][j];
-
-        if (playerOnTile === TILE_EMPTY) continue;
-
-        let success = true;
-
-        // Check horizontal line
-        this.state[i].forEach((tile) => {
-          if (tile !== playerOnTile) {
-            success = false;
-            return;
-          }
-        });
-
-        if (success) {
-          return playerOnTile;
-        }
-
-        success = true;
-
-        // Check vertical line
-        for (let k = 0; k < this.state.length; k++) {
-          if (this.state[k][j] !== playerOnTile) {
-            success = false;
-            break;
-          }
-        }
-
-        if (success) {
-          return playerOnTile;
-        }
-      }
-    }
-
     // Check diagonals
     /*
         1 0 0 
@@ -170,6 +140,64 @@ export default class Board {
 
     if (success) {
       return playerOnTile;
+    }
+
+    // Check horizontals
+    /*
+        1 1 1 
+        0 0 0
+        0 0 0
+    */
+
+    for (let i = 0; i < 3; i++) {
+      playerOnTile = this.state[i][0];
+      success = true;
+
+      if (playerOnTile !== TILE_EMPTY) {
+        if (
+          !(
+            this.state[i][1] === playerOnTile &&
+            this.state[i][2] === playerOnTile
+          )
+        ) {
+          success = false;
+        }
+      } else {
+        success = false;
+      }
+
+      if (success) {
+        return playerOnTile;
+      }
+    }
+
+    // Check verticals
+    /*
+        1 0 0 
+        1 0 0
+        1 0 0
+    */
+
+    for (let i = 0; i < 3; i++) {
+      playerOnTile = this.state[0][i];
+      success = true;
+
+      if (playerOnTile !== TILE_EMPTY) {
+        if (
+          !(
+            this.state[1][i] === playerOnTile &&
+            this.state[2][i] === playerOnTile
+          )
+        ) {
+          success = false;
+        }
+      } else {
+        success = false;
+      }
+
+      if (success) {
+        return playerOnTile;
+      }
     }
 
     return null;

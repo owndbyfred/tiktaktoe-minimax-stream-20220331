@@ -10,22 +10,86 @@ import {
 
 export class MiniMax {
   constructor(board, player, depth = 0) {
-    this.bestTurn = {};
+    this.board = board;
+    this.savedTurn = {};
 
-    this.minimax(board, player, depth);
+    this.max(player, depth);
+  }
+
+  addTurn({ x, y, value }) {
+    if (!this.turns[`${value}`]) this.turns[`${value}`] = [];
+
+    this.turns[`${value}`].push({ x, y });
   }
 
   getBestTurn() {
-    return this.bestTurn;
+    return this.savedTurn;
   }
 
-  minimax(board, player, depth = 0) {
-    // Determine available turns
+  max(player, depth) {
+    const availableSpots = this.getAvailableSpots();
+
+    let maxValue = Number.NEGATIVE_INFINITY;
+
+    if (availableSpots.length <= 0 || this.board.checkWinner()) {
+      return this.valueBoardState();
+    }
+
+    availableSpots.forEach((spot) => {
+      const { x, y } = spot;
+
+      this.board.makeTurn(x, y, player, false);
+
+      const value = this.min(this.getNewPlayer(player), depth + 1);
+
+      this.board.setTileEmpty(x, y);
+
+      if (value > maxValue) {
+        maxValue = value;
+
+        if (depth === 0) {
+          console.log("TURN GEFUNDEN");
+          console.log({ x, y });
+          this.savedTurn = { x, y };
+        }
+      }
+    });
+
+    return maxValue;
+  }
+
+  min(player, depth) {
+    const availableSpots = this.getAvailableSpots();
+
+    let minValue = Number.POSITIVE_INFINITY;
+
+    if (availableSpots.length <= 0 || this.board.checkWinner()) {
+      return this.valueBoardState();
+    }
+
+    availableSpots.forEach((spot) => {
+      const { x, y } = spot;
+
+      this.board.makeTurn(x, y, player, false);
+
+      const value = this.max(this.getNewPlayer(player), depth + 1);
+
+      this.board.setTileEmpty(x, y);
+
+      if (value < minValue) {
+        minValue = value;
+      }
+    });
+
+    return minValue;
+  }
+
+  getAvailableSpots() {
     let availableSpots = [];
 
-    board.state.forEach((row, i) => {
+    this.board.state.forEach((row, i) => {
       row.forEach((tile, j) => {
-        if (board.isTileEmpty(j, i)) {
+        if (this.board.isTileEmpty(j, i)) {
           availableSpots.push({
             x: j,
             y: i,
@@ -34,49 +98,22 @@ export class MiniMax {
       });
     });
 
-    //   console.log(availableSpots);
+    return availableSpots;
+  }
 
-    if (availableSpots.length < 1) {
-      const winner = board.checkWinner();
-      // AI is ALWAYS 2nd player
-      if (winner === TILE_PLAYER_1) {
-        return player === TILE_PLAYER_2 ? WIN : LOSS;
-      } else if (winner === TILE_PLAYER_2) {
-        return player === TILE_PLAYER_2 ? LOSS : WIN;
-      } else {
-        return DRAW;
-      }
+  getNewPlayer(player) {
+    return player === PLAYER_1 ? PLAYER_2 : PLAYER_1;
+  }
+
+  valueBoardState() {
+    const winner = this.board.checkWinner();
+
+    if (winner === PLAYER_1) {
+      return LOSS;
+    } else if (winner === PLAYER_2) {
+      return WIN;
+    } else {
+      return DRAW;
     }
-
-    let maxValue = Number.NEGATIVE_INFINITY;
-
-    availableSpots.forEach(({ x, y }) => {
-      const newBoard = Object.assign(
-        Object.create(Object.getPrototypeOf(board)),
-        board
-      );
-
-      const newPlayer = player === PLAYER_1 ? PLAYER_2 : PLAYER_1;
-
-      newBoard.makeTurn(x, y, player, false);
-
-      let turn = this.minimax(newBoard, newPlayer, depth + 1);
-
-      newBoard.setTileEmpty(x, y);
-
-      if (-turn > maxValue) {
-        maxValue = -turn;
-        // console.log(maxValue, x, y);
-
-        if (depth === 0) {
-          this.bestTurn = { x, y };
-          console.log("BEST TURN: ", this.bestTurn, maxValue);
-        }
-      }
-    });
-
-    //   console.log(maxValue);
-
-    return maxValue;
   }
 }
