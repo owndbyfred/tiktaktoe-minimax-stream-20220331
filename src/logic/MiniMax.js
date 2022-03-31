@@ -26,7 +26,7 @@ export class MiniMax {
     const winner = this.board.checkWinner();
 
     if (availableSpots.length <= 0 || winner) {
-      return this.valueBoardState(winner);
+      return this.valueBoardState(winner, depth);
     }
 
     availableSpots.forEach((spot) => {
@@ -58,7 +58,7 @@ export class MiniMax {
     const winner = this.board.checkWinner();
 
     if (availableSpots.length <= 0 || winner) {
-      return this.valueBoardState();
+      return this.valueBoardState(winner, depth);
     }
 
     availableSpots.forEach((spot) => {
@@ -99,11 +99,11 @@ export class MiniMax {
     return player === PLAYER_1 ? PLAYER_2 : PLAYER_1;
   }
 
-  valueBoardState(winner) {
+  valueBoardState(winner, depth) {
     if (winner === PLAYER_1) {
-      return LOSS;
+      return LOSS - depth;
     } else if (winner === PLAYER_2) {
-      return WIN;
+      return WIN - depth;
     } else {
       return DRAW;
     }
