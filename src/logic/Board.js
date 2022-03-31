@@ -10,6 +10,9 @@ import {
 export default class Board {
   constructor(state = null) {
     this.tileEles = document.querySelectorAll(".Board__Cell");
+    this.winnerAlertEle = document.querySelector(".WinnerAlert");
+    this.winnerTextEle = document.querySelector(".WinnerAlert__Winner");
+    this.playAgainButtonEle = document.querySelector(".WinnerAlert__PlayAgain");
     this.state = state;
     this.isRunning = true;
 
@@ -17,11 +20,7 @@ export default class Board {
   }
 
   init() {
-    this.state = [
-      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
-      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
-      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
-    ];
+    this.resetState();
 
     this.tileEles.forEach((tileEle) => {
       tileEle.addEventListener("click", ({ target }) => {
@@ -40,6 +39,24 @@ export default class Board {
         }
       });
     });
+
+    this.playAgainButtonEle.addEventListener("click", () => {
+      this.resetState();
+      // Clear visuals
+      this.tileEles.forEach((tile) => {
+        tile.innerHTML = "";
+      });
+      this.isRunning = true;
+      this.winnerAlertEle.classList.remove("-Show");
+    });
+  }
+
+  resetState() {
+    this.state = [
+      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
+      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
+      [TILE_EMPTY, TILE_EMPTY, TILE_EMPTY],
+    ];
   }
 
   getState() {
@@ -66,13 +83,36 @@ export default class Board {
 
     // Check if winner:
     const winner = this.checkWinner();
-    if (winner && isHumanTurn) {
-      alert(`Spieler ${winner} hat gewonnen!`);
+    if ((winner || this.isBoardFull()) && isHumanTurn) {
+      if (winner) {
+        this.winnerTextEle.innerHTML = `Player ${winner} wins!`;
+        this.winnerAlertEle.setAttribute("data-player", winner);
+      } else {
+        this.winnerTextEle.innerHTML = `It's a tie!`;
+        this.winnerAlertEle.setAttribute("data-player", "draw");
+      }
+
+      this.winnerAlertEle.classList.add("-Show");
     }
 
     if (winner && isHumanTurn) this.isRunning = false;
 
     return true;
+  }
+
+  isBoardFull() {
+    let full = true;
+
+    this.state.forEach((row, i) => {
+      row.forEach((tile, j) => {
+        if (this.isTileEmpty(j, i)) {
+          full = false;
+          return;
+        }
+      });
+    });
+
+    return full;
   }
 
   isTileEmpty(x, y) {
