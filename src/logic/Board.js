@@ -61,6 +61,7 @@ export default class Board {
         player === PLAYER_1 ? SYMBOL_PLAYER_1 : SYMBOL_PLAYER_2;
 
       tileEle.innerHTML = playerSymbol;
+      tileEle.setAttribute("data-player", player);
     }
 
     // Check if winner:

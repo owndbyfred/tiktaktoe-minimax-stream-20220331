@@ -1,8 +1,42 @@
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rock+3D&family=Rock+Salt&display=swap");
+
+body {
+  font-family: "Courier New", Courier, monospace;
+}
+
+[data-font="Marker"] {
+  font-family: "Permanent Marker", serif;
+}
+[data-font="Salt"] {
+  font-family: "Rock Salt", serif;
+}
+[data-font="3D"] {
+  font-family: "Rock 3D", serif;
+}
+
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.Dropdown {
+  width: 200px;
+  height: 40px;
+
+  &__Heading {
+    font-size: 30px;
+  }
+}
+
 .Board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 300px;
-  margin: 200px auto;
+  margin: 100px auto;
 
   &__Cell {
     width: 100px;
@@ -12,6 +46,14 @@
     justify-content: center;
     border: 1px solid black;
     font-size: 70px;
+
+    &[data-player="1"] {
+      color: blue;
+    }
+
+    &[data-player="2"] {
+      color: red;
+    }
 
     &:hover {
       cursor: pointer;

@@ -8,7 +8,16 @@
     <title>Document</title>
   </head>
   <body>
-    <div class="Board">
+    <div class="Container">
+      <h2 class="Dropdown__Heading">Select Skin</h2>
+      <select class="Dropdown" name="Font__Select" id="Font__Select">
+        <option value="Salt" data-font="Salt">X / O (Salt)</option>
+        <option value="3D" data-font="3D">X / O (3D)</option>
+        <option value="Marker" data-font="Marker">X / O (Marker)</option>
+      </select>
+    </div>
+
+    <div class="Board" data-font="Salt">
       <div class="Board__Cell" data-index="0-0"></div>
       <div class="Board__Cell" data-index="0-1"></div>
       <div class="Board__Cell" data-index="0-2"></div>
