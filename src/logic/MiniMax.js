@@ -1,12 +1,4 @@
-import {
-  WIN,
-  DRAW,
-  LOSS,
-  PLAYER_1,
-  PLAYER_2,
-  TILE_PLAYER_1,
-  TILE_PLAYER_2,
-} from "./Types";
+import { WIN, DRAW, LOSS, PLAYER_1, PLAYER_2 } from "./Types";
 
 export class MiniMax {
   constructor(board, player, depth = 0) {
@@ -48,8 +40,6 @@ export class MiniMax {
         maxValue = value;
 
         if (depth === 0) {
-          console.log("TURN GEFUNDEN");
-          console.log({ x, y });
           this.savedTurn = { x, y };
         }
       }

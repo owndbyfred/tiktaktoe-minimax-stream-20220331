@@ -5,8 +5,6 @@ import {
   SYMBOL_PLAYER_1,
   SYMBOL_PLAYER_2,
   TILE_EMPTY,
-  TILE_PLAYER_1,
-  TILE_PLAYER_2,
 } from "./Types";
 
 export default class Board {
@@ -37,7 +35,7 @@ export default class Board {
 
             const { x, y } = miniMax.getBestTurn();
 
-            this.makeTurn(x, y, TILE_PLAYER_2);
+            this.makeTurn(x, y, PLAYER_2);
           }
         }
       });
